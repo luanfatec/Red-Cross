@@ -10,7 +10,7 @@ clear
 function dependencies() {
     echo -e $green"Checking Dependencies..."$standard; sleep 1
 
-	PROGRAMA=( "gnome-terminal" "figlet" "grep" )
+	PROGRAMA=( "gnome-terminal" "figlet" "grep" "zenity" )
 	for prog in "${PROGRAMA[@]}";do
         echo -ne "\033[00;32m               ----------------| $prog for dependencies "
 		if ! hash "$prog" 2>/dev/null;then
@@ -69,6 +69,9 @@ config_ngrok_key() {
     fi
 }
 
+attack_android() {
+    clear
+}
 
 logo()
 {
@@ -84,24 +87,30 @@ echo -ne "\n$yellow [1]$green Attack android system \n$yellow [2]$green Attack l
 
 
 case $option in
-    1) clear
-        attack_android 
-	source red-cross.sh;;
-    2) clear
-        attack_linux 
-	source red-cross.sh;;
-    3) clear
-        attack_windows 
-	source red-cross.sh;;
+    1)  clear
+        source vendor/Android
+        source red-cross.sh;;
+    
+    2)  clear
+        source vendor/Windows
+        source red-cross.sh;;
+    
+    3)  clear
+        source vendor/Linux
+        source red-cross.sh;;
+    
     4) clear
         config_ngrok 
 	source red-cross.sh;;
+    
     5) clear
         config_ngrok_key 
 	source red-cross.sh ;;
+    
     6) clear
         dependencies 
 	source red-cross.sh;;
+    
     *) clear
         source red-cross.sh ;;
 esac
