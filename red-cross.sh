@@ -92,11 +92,11 @@ case $option in
         source red-cross.sh;;
     
     2)  clear
-        source vendor/Windows
+        source vendor/Linux
         source red-cross.sh;;
     
     3)  clear
-        source vendor/Linux
+        source vendor/Windows
         source red-cross.sh;;
     
     4) clear
